@@ -36,7 +36,7 @@ jobs:
     - name: Mount /dev/sdb1 to build
       run: |
         chmod +x build_dir.sh
-        sudo ./build_dir.sh
+        ./build_dir.sh
         
     - name: Clone source code
       run: cd build && git clone --depth 1 $REPO_URL .

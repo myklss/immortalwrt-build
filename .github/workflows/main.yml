@@ -58,7 +58,7 @@ jobs:
       run: |
         ./scripts/feeds update -a
         ./scripts/feeds install -a
-        working-directory: ./build
+      working-directory: ./build
 
     #- name: Modify default IP      #修改默认IP(默认注释,要修改IP把这2行#去掉即可)
     #  run: sed -i 's/192.168.1.1/192.168.7.41/g' package/base-files/files/bin/config_generate
@@ -78,7 +78,7 @@ jobs:
       run: |
         echo -e "$(nproc) thread compile"
         make -j$(( $(nproc) - 1 )) || make -j1 || make -j1 V=s
-        working-directory: ./build
+      working-directory: ./build
 
     - name: Prepare artifact
       run: |
@@ -87,7 +87,7 @@ jobs:
         find ./bin/targets/ -type d -name "packages" -exec rm -rf {} +
         find ./bin/packages/ -type f -name "*.ipk" -exec cp -f {} ./artifact/package/ \;
         find ./bin/targets/ -type f \( -name "*.buildinfo" -o -name "*.manifest" \) -exec cp -f {} ./artifact/buildinfo/ \;
-        working-directory: ./build
+      working-directory: ./build
 
     - name: Upload buildinfo
       uses: actions/upload-artifact@v3

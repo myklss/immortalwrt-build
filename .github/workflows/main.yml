@@ -16,6 +16,10 @@ jobs:
   build:
     runs-on: ubuntu-20.04
 
+    defaults:
+      run:
+        working-directory: ./build
+
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -37,8 +41,8 @@ jobs:
 
     - name: mount build-dir
       run: |
-          chmod +x build_dir.sh
-          ./build_dir.sh
+          chmod +x ../build_dir.sh
+          ../build_dir.sh
       
     - name: Clone source code
       run: git clone --depth 1 $REPO_URL openwrt
@@ -47,7 +51,7 @@ jobs:
       run: mv openwrt/* .
 
     - name: Load custom feeds
-      run: mv feeds.conf.default.bak feeds.conf.default
+      run: mv ../feeds.conf.default.bak feeds.conf.default
 
     - name: Update and install feeds
       run: |
@@ -58,7 +62,7 @@ jobs:
     #  run: sed -i 's/192.168.1.1/192.168.7.41/g' package/base-files/files/bin/config_generate
 
     - name: Load custom configuration
-      run: mv .config.bak .config
+      run: mv ../.config.bak .config
 
     - name: Use tmate connect ssh
       uses: mxschmitt/action-tmate@v3

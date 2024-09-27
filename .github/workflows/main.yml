@@ -35,14 +35,14 @@ jobs:
         python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig \
         texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
 
-    - name: mount build-dir
+    - name: mount build-dir      #挂载build目录
       run: |
           chmod +x ./build_dir.sh
           ./build_dir.sh
         
     - name: Clone source code
       run: git clone --depth 1 $REPO_URL openwrt
-      working-directory: ./build
+      working-directory: ./build #设置工作目录
 
     - name: Move project
       run: mv openwrt/* .

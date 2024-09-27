@@ -16,10 +16,6 @@ jobs:
   build:
     runs-on: ubuntu-20.04
 
-    defaults:
-      run:
-        working-directory: ./build
-
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -41,42 +37,49 @@ jobs:
 
     - name: mount build-dir
       run: |
-          chmod +x ../build_dir.sh
-          ../build_dir.sh
-      
+          chmod +x ./build_dir.sh
+          ./build_dir.sh
+
+    - name: Load custom feeds
+      run: mv feeds.conf.default.bak ./build/feeds.conf.default
+
+    - name: Load custom configuration
+      run: mv .config.bak ./build.config
+        
     - name: Clone source code
       run: git clone --depth 1 $REPO_URL openwrt
+      working-directory: ./build
 
     - name: Move project
       run: mv openwrt/* .
-
-    - name: Load custom feeds
-      run: mv ../feeds.conf.default.bak feeds.conf.default
+      working-directory: ./build
 
     - name: Update and install feeds
       run: |
         ./scripts/feeds update -a
         ./scripts/feeds install -a
+        working-directory: ./build
 
     #- name: Modify default IP      #修改默认IP(默认注释,要修改IP把这2行#去掉即可)
     #  run: sed -i 's/192.168.1.1/192.168.7.41/g' package/base-files/files/bin/config_generate
-
-    - name: Load custom configuration
-      run: mv ../.config.bak .config
+    #working-directory: ./build
 
     - name: Use tmate connect ssh
       uses: mxschmitt/action-tmate@v3
       with:
         limit-access-to-actor: false  #如果github设置了SSH keys则这里可以输入true使用密钥登录
       if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh != 'false') || contains(github.event.action, 'ssh')
+      working-directory: ./build
 
     - name: Download packages
       run: make download -j$(nproc)
+      working-directory: ./build
 
     - name: Compile firmware
       run: |
         echo -e "$(nproc) thread compile"
         make -j$(( $(nproc) - 1 )) || make -j1 || make -j1 V=s
+        working-directory: ./build
 
     - name: Prepare artifact
       run: |
@@ -85,21 +88,25 @@ jobs:
         find ./bin/targets/ -type d -name "packages" -exec rm -rf {} +
         find ./bin/packages/ -type f -name "*.ipk" -exec cp -f {} ./artifact/package/ \;
         find ./bin/targets/ -type f \( -name "*.buildinfo" -o -name "*.manifest" \) -exec cp -f {} ./artifact/buildinfo/ \;
+        working-directory: ./build
 
     - name: Upload buildinfo
       uses: actions/upload-artifact@v3
       with:
         name: OpenWrt_buildinfo
         path: ./artifact/buildinfo/
+        working-directory: ./build
 
     - name: Upload package
       uses: actions/upload-artifact@v3
       with:
         name: OpenWrt_package
         path: ./artifact/package/
+        working-directory: ./build
 
     - name: Upload firmware
       uses: actions/upload-artifact@v3
       with:
         name: OpenWrt_firmware
         path: ./bin/targets/
+        working-directory: ./build

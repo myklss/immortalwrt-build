@@ -39,7 +39,7 @@ jobs:
         sudo ./build_dir.sh
         
     - name: Clone source code
-      run: cd build && git clone --depth 1 $REPO_URL build
+      run: cd build && git clone --depth 1 $REPO_URL .
 
     - name: Load custom feeds
       run: mv feeds.conf.default.bak feeds.conf.default

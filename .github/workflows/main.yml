@@ -35,10 +35,10 @@ jobs:
         python3-docutils python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig \
         texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev zstd
 
-    - name: Expansion partition
+    - name: mount build-dir
       run: |
-          chmod +x Expansion.sh
-          ./Expansion.sh
+          chmod +x build_dir.sh
+          ./build_dir.sh
       
     - name: Clone source code
       run: git clone --depth 1 $REPO_URL openwrt

@@ -43,7 +43,7 @@ jobs:
 
     - name: Move project and cd openwrt dir
       run: |
-          mv openwrt build
+          mv openwrt/* build/
           cd build
 
     - name: Load custom feeds

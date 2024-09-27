@@ -37,23 +37,24 @@ jobs:
       run: |
         chmod +x build_dir.sh
         ./build_dir.sh
-        
+
     - name: Clone source code
-      run: cd build && git clone --depth 1 $REPO_URL .
+      run: git clone --depth 1 $REPO_URL build
 
     - name: Load custom feeds
-      run: mv feeds.conf.default.bak feeds.conf.default
+      run: mv feeds.conf.default.bak ./build/feeds.conf.default
 
     - name: Update and install feeds
       run: |
         ./scripts/feeds update -a
         ./scripts/feeds install -a
+      working-directory: ./build
 
     #- name: Modify default IP      #修改默认IP(默认注释,要修改IP把这2行#去掉即可)
-    #  run: sed -i 's/192.168.1.1/192.168.7.41/g' package/base-files/files/bin/config_generate
+    #  run: sed -i 's/192.168.1.1/192.168.7.41/g' ./build/package/base-files/files/bin/config_generate
 
     - name: Load custom configuration
-      run: mv .config.bak .config
+      run: mv .config.bak ./build/.config
 
     - name: Use tmate connect ssh
       uses: mxschmitt/action-tmate@v3
@@ -63,34 +64,36 @@ jobs:
 
     - name: Download packages
       run: make download -j$(nproc)
+      working-directory: ./build
 
     - name: Compile firmware
       run: |
         echo -e "$(nproc) thread compile"
         make -j$(( $(nproc) - 1 )) || make -j1 || make -j1 V=s
+      working-directory: ./build
 
     - name: Prepare artifact
       run: |
-        mkdir -p ./artifact/package
-        mkdir -p ./artifact/buildinfo
-        find ./bin/targets/ -type d -name "packages" -exec rm -rf {} +
-        find ./bin/packages/ -type f -name "*.ipk" -exec cp -f {} ./artifact/package/ \;
-        find ./bin/targets/ -type f \( -name "*.buildinfo" -o -name "*.manifest" \) -exec cp -f {} ./artifact/buildinfo/ \;
+        mkdir -p ./build/artifact/package
+        mkdir -p ./build/artifact/buildinfo
+        find ./build/bin/targets/ -type d -name "packages" -exec rm -rf {} +
+        find ./build/bin/packages/ -type f -name "*.ipk" -exec cp -f {} ./build/artifact/package/ \;
+        find ./build/bin/targets/ -type f \( -name "*.buildinfo" -o -name "*.manifest" \) -exec cp -f {} ./build/artifact/buildinfo/ \;
 
     - name: Upload buildinfo
       uses: actions/upload-artifact@v3
       with:
         name: OpenWrt_buildinfo
-        path: ./artifact/buildinfo/
+        path: ./build/artifact/buildinfo/
 
     - name: Upload package
       uses: actions/upload-artifact@v3
       with:
         name: OpenWrt_package
-        path: ./artifact/package/
+        path: ./build/artifact/package/
 
     - name: Upload firmware
       uses: actions/upload-artifact@v3
       with:
         name: OpenWrt_firmware
-        path: ./bin/targets/
+        path: ./build/bin/targets/

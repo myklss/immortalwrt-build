@@ -58,16 +58,16 @@ jobs:
       run: mv openwrt/* .
       working-directory: ./build
 
-    - name: Load custom feeds
-      run: mv feeds.conf.default.bak ./build/feeds.conf.default
-
-    #- name: Load custom configuration
-    #  run: mv .config.bak ./build.config
+    - name: Load custom configuration
+      run: mv .config.bak ./build/.config
 
     #- name: Modify default IP      #修改默认IP(默认注释,要修改IP把这2行#去掉即可)
     #  run: sed -i 's/192.168.1.1/192.168.7.41/g' package/base-files/files/bin/config_generate
     #  working-directory: ./build
 
+    - name: Load custom feeds
+      run: mv feeds.conf.default.bak ./build/feeds.conf.default
+      
     - name: Update and install feeds
       run: |
         ./scripts/feeds update -a

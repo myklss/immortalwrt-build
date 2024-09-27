@@ -71,13 +71,13 @@ jobs:
       if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh != 'false') || contains(github.event.action, 'ssh')
 
     - name: Download packages
-      run: make download -j$(nproc)
+      run: make download -j$(($(nproc) / 2))
       working-directory: ./build
 
     - name: Compile firmware
       run: |
         echo -e "$(nproc) thread compile"
-        make -j$(( $(nproc) - 1 )) || make -j1 || make -j1 V=s
+        make -j1 V=s || make -j1 V=s
       working-directory: ./build
 
     - name: Prepare artifact

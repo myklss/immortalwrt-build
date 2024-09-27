@@ -41,11 +41,10 @@ jobs:
     - name: Clone source code
       run: git clone --depth 1 $REPO_URL openwrt
 
-    - name: Move project
-      run: mv openwrt build
-
-    - name: cd openwrt dir
-      run: cd build
+    - name: Move project and cd openwrt dir
+      run: |
+          mv openwrt build
+          cd build
 
     - name: Load custom feeds
       run: mv feeds.conf.default.bak feeds.conf.default

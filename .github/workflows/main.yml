@@ -87,7 +87,7 @@ jobs:
     - name: Compile firmware
       run: |
         echo -e "$(nproc) thread compile"
-        make -j1 V=s || make -j1 V=s
+        make V=s -j1
       working-directory: ./build
 
     - name: Prepare artifact
